@@ -1,19 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>To-Do List</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container">
-    <h1>To-Do List</h1>
-    <div class="input-group">
-      <input type="text" id="taskInput" placeholder="What do you need to do?" />
-      <button onclick="addTask()">Add</button>
+  <head>
+    <meta charset="UTF-8" />
+    <title>To-Do List</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f7fa;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 500px;
+        background: white;
+        padding: 20px 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        display: flex;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 6px 0 0 6px;
+        outline: none;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 0 6px 6px 0;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f0f0f0;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+      }
+
+      li span {
+        flex-grow: 1;
+        cursor: pointer;
+      }
+
+      li span.done {
+        text-decoration: line-through;
+        color: gray;
+      }
+
+      li button {
+        background-color: #dc3545;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      li button:hover {
+        background-color: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>To-Do List</h1>
+      <div class="input-group">
+        <input
+          type="text"
+          id="taskInput"
+          placeholder="What do you need to do?"
+        />
+        <button onclick="addTask()">Add</button>
+      </div>
+      <ul id="taskList"></ul>
     </div>
-    <ul id="taskList"></ul>
-  </div>
-  <script src="script.js">
-</body>
+
+    <script>
+      const taskInput = document.getElementById("taskInput");
+      const taskList = document.getElementById("taskList");
+
+      let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+      // Load tasks from localStorage
+      window.onload = () => {
+        tasks.forEach((task) => renderTask(task));
+      };
+
+      function addTask() {
+        const taskText = taskInput.value.trim();
+        if (taskText === "") return;
+
+        const newTask = { text: taskText, done: false };
+        tasks.push(newTask);
+        updateLocalStorage();
+        renderTask(newTask);
+        taskInput.value = "";
+      }
+
+      function renderTask(task) {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.innerText = task.text;
+        if (task.done) span.classList.add("done");
+        span.onclick = () => {
+          task.done = !task.done;
+          span.classList.toggle("done");
+          updateLocalStorage();
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Delete";
+        deleteBtn.onclick = () => {
+          tasks = tasks.filter((t) => t !== task);
+          taskList.removeChild(li);
+          updateLocalStorage();
+        };
+
+        li.appendChild(span);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+      }
+
+      function updateLocalStorage() {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
+    </script>
+  </body>
 </html>
